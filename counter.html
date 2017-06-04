@@ -1,0 +1,200 @@
+<!doctype html>
+
+<html lang="us">
+
+  <head>
+    
+    <meta charset="utf-8">
+    
+    <title></title>
+
+    <style>
+
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      #dollars {
+        padding-left: 20px;
+      }
+
+    </style>
+    
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.12.0.min.js"></script>
+    
+    <script language="javascript" type="text/javascript">
+
+      // var startTime = Date.now();
+      var lastCheck = Date.now();
+
+      var secondsWorked = 0;
+
+      var SECONDS_TO_WORK = 60 * 60 * 8;
+      
+      var DAILY_PAY = 238;
+
+      var PAY_PER_SECOND = DAILY_PAY / 8 / 60 / 60;
+
+      var isPaused = false;
+
+      function pause() {
+        isPaused = true;
+      }
+
+      function resume() {
+        isPaused = false;
+      }
+
+      function add() {
+        secondsWorked += parseInt($("#adjust").val()) * 60;
+      }
+
+      function subtract() {
+        secondsWorked -= parseInt($("#adjust").val()) * 60;
+      }
+
+      function getFriendlyTime(seconds) {
+
+        if(seconds < 60) {
+          return seconds + " sec";
+        
+        } else if (seconds < 60*60) {
+          return (((seconds / 60)+"") .substring(0, 2)) + " min";
+
+        } else {
+          return (((seconds / 60 / 60)+"").substring(0, 4)) + " hrs";
+
+        }
+      }
+
+      function getDollarsImage(amount) {
+
+        var image = '<img src="dollar2.png" style="width:40px; height:20px;">';
+        
+        var expenses = parseInt($("#expenses").val());
+
+        var redImage = '<img src="dollar3.jpg" style="width:40px; height:20px;">';
+
+        var html = '';
+
+        for(var i = 1; i <= amount; i++) {
+
+          if(expenses && expenses > 0) {
+
+            html += redImage;
+            expenses--;
+
+          } else {
+
+            html += image;
+          }
+          
+          if(i % 10 == 0) {
+
+            html += '<br/>'; 
+          }
+        }
+
+        return html;
+      }
+      
+      $(document).ready(function() {
+
+        setInterval(function() {
+          
+          // if(!isPaused) {
+
+          //   secondsWorked++;            
+          // }
+
+          secondsWorked += (Date.now() - lastCheck) / 1000;
+          lastCheck = Date.now();
+
+        }, 1000);
+
+        setInterval(function() {
+          
+          // if(!isPaused) {
+
+            var income = (secondsWorked * PAY_PER_SECOND);
+
+            var workSummary = 
+              "<h3> Worked: " +  getFriendlyTime(secondsWorked) + "</h3>" + 
+              "<h3> Earned: <span style='color: #037215; font-weight: bold;'>$" + ( "" + income ).substring(0, 6) + "</span></h3>";
+              
+            $("#workedSummary").html(workSummary);
+
+            var remainingSummary = 
+              "<h3> Remaining: " + getFriendlyTime(SECONDS_TO_WORK - secondsWorked)  + " </h3> " +
+              "<h3> To Earn: <span style='color: #037215; font-weight: bold;'>$" + ( "" + (DAILY_PAY - income) ).substring(0, 6) + "</span></h3>";
+              
+            $("#remainingSummary").html(remainingSummary);
+
+            $("#dollars").html(getDollarsImage(Math.floor(income)));
+          // }
+
+        }, 1000);
+
+      });
+      
+    </script>
+
+
+  </head>
+  
+  <body>
+
+    <table> 
+
+      <tr>
+
+        <td>
+
+          <div id="workedSummary"></div>
+
+          <!--<button onClick="pause();">Pause</button>
+
+          <button onClick="resume();">Resume</button>
+          -->
+          <br/>
+          <br/>
+          <hr/>
+
+          <h3>Adjust minutes worked: </h3>
+          
+          <input type='text' id='adjust' />
+          
+          <br/>
+          <br/>
+          
+          <button onClick="add();">Add</button>
+
+          <button onClick="subtract();">Subtract</button>
+
+          <br/>
+          <br/>
+          <hr/>
+
+          <div id="remainingSummary"></div>
+
+          <!-- <h3> Daily Expenses: </h3>
+          
+          <input type='text' id='expenses' />          
+
+           --><br/>
+
+        </td>
+        
+        <td>  
+        
+          <div id="dollars"></div>
+
+        </td>
+      
+      </tr>
+
+    </table>
+
+  </body>
+
+</html>
